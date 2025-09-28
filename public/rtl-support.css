@@ -1,0 +1,222 @@
+/* RTL Support Styles */
+
+/* Base RTL adjustments */
+[dir="rtl"] {
+    text-align: right;
+}
+
+[dir="rtl"] body {
+    font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Arial', sans-serif;
+}
+
+/* Header RTL */
+[dir="rtl"] header {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] #auth-status {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* Main Layout RTL */
+[dir="rtl"] .main-layout {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .warehouse-selection {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .warehouse-group {
+    text-align: right;
+}
+
+[dir="rtl"] .warehouse-group label {
+    text-align: right;
+    margin-bottom: 8px;
+}
+
+/* Search Section RTL */
+[dir="rtl"] .search-container {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] #search-input {
+    text-align: right;
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+[dir="rtl"] .product-item {
+    text-align: right;
+}
+
+[dir="rtl"] .product-details {
+    text-align: right;
+}
+
+[dir="rtl"] .product-actions {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* Cart Section RTL */
+[dir="rtl"] .cart-item {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .cart-item-details {
+    text-align: right;
+    margin-right: 0;
+    margin-left: auto;
+}
+
+[dir="rtl"] .cart-item button {
+    margin-right: auto;
+    margin-left: 0;
+}
+
+/* Popup RTL */
+[dir="rtl"] .popup-header {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .popup-close {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+[dir="rtl"] .input-label {
+    text-align: right;
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .label-icon {
+    margin-left: 0;
+    margin-right: 8px;
+}
+
+[dir="rtl"] .total-header {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .total-icon {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+[dir="rtl"] .popup-footer {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .btn {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .btn-icon {
+    margin-right: 0;
+    margin-left: 8px;
+}
+
+/* Progress RTL */
+[dir="rtl"] .progress-item {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+}
+
+/* Sync Status RTL */
+[dir="rtl"] #sync-status p {
+    text-align: right;
+}
+
+/* Loading Overlay RTL */
+[dir="rtl"] .loading-content {
+    text-align: center; /* Keep centered for loading */
+}
+
+/* Language Switcher Styles */
+.language-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+[dir="rtl"] .language-switcher {
+    right: auto;
+    left: 20px;
+    flex-direction: row-reverse;
+}
+
+.language-switcher label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+    margin: 0;
+}
+
+.language-switcher select {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 100px;
+}
+
+.language-switcher select:hover {
+    border-color: #2c3e50;
+    background: #f8f9fa;
+}
+
+.language-switcher select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Arabic Font Enhancement */
+[dir="rtl"] * {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Arial', 'Noto Sans Arabic', 'Cairo', sans-serif;
+}
+
+/* Number input RTL fix */
+[dir="rtl"] input[type="number"] {
+    direction: ltr;
+    text-align: right;
+}
+
+/* Select dropdown RTL */
+[dir="rtl"] select {
+    text-align: right;
+    padding-right: 30px;
+    background-position: left 10px center;
+}
+
+/* Mobile Responsive RTL */
+@media (max-width: 768px) {
+    [dir="rtl"] .language-switcher {
+        top: 10px;
+        left: 10px;
+        right: auto;
+    }
+
+    [dir="rtl"] .main-layout {
+        flex-direction: column;
+    }
+
+    [dir="rtl"] .warehouse-selection {
+        flex-direction: column;
+    }
+}

@@ -30,33 +30,33 @@ function showLoadingState(state, message = '') {
     
     switch (state) {
         case LoadingStates.CONNECTING:
-            title.textContent = 'Connecting to Zoho...';
-            messageEl.textContent = message || 'Please wait while we establish connection';
+            title.textContent = t('connectingToZoho');
+            messageEl.textContent = message || t('pleaseWaitConnection');
             progressContainer.style.display = 'none';
             break;
             
         case LoadingStates.SYNCING:
-            title.textContent = '✅ Connected to Zoho';
-            messageEl.textContent = message || 'Syncing items and warehouses...';
+            title.textContent = t('connectedToZoho');
+            messageEl.textContent = message || t('syncingItemsWarehouses');
             progressContainer.style.display = 'block';
             updateProgress();
             break;
             
         case LoadingStates.CREATING_TRANSFER:
-            title.textContent = '🔄 Creating Transfer Order';
-            messageEl.textContent = message || 'Processing your transfer order...';
+            title.textContent = t('creatingTransferOrder');
+            messageEl.textContent = message || t('processingTransferOrder');
             progressContainer.style.display = 'none';
             break;
             
         case LoadingStates.GENERATING_PDF:
-            title.textContent = '📄 Generating PDF';
-            messageEl.textContent = message || 'Creating transfer order document...';
+            title.textContent = t('generatingPDF');
+            messageEl.textContent = message || t('creatingDocument');
             progressContainer.style.display = 'none';
             break;
             
         case LoadingStates.DOWNLOADING_FILE:
-            title.textContent = '⬇️ Downloading File';
-            messageEl.textContent = message || 'Downloading transfer order PDF...';
+            title.textContent = t('downloadingFile');
+            messageEl.textContent = message || t('downloadingPDF');
             progressContainer.style.display = 'none';
             break;
             
@@ -134,7 +134,7 @@ window.onload = async function() {
         window.history.replaceState({}, document.title, '/');
     } else if (authStatus === 'error') {
         hideLoadingState();
-        alert('Authentication failed. Please try again.');
+        alert(t('authenticationFailed'));
         window.history.replaceState({}, document.title, '/');
     } else if (code) {
         // Old flow - exchange code for token
@@ -175,7 +175,7 @@ async function checkAuthStatus() {
         } else {
             // Auto-authenticate if not authenticated
             console.log('Not authenticated, auto-connecting to Zoho...');
-            showLoadingState(LoadingStates.CONNECTING, 'Auto-connecting to Zoho...');
+            showLoadingState(LoadingStates.CONNECTING, t('autoConnectingToZoho'));
             setTimeout(() => {
                 login();
             }, 1000); // Small delay to let UI load
@@ -196,7 +196,7 @@ function showMainContent() {
     document.getElementById('main-content').style.display = 'block';
     document.getElementById('login-btn').style.display = 'none';
     document.getElementById('sync-btn').style.display = 'inline-block';
-    document.getElementById('status-text').textContent = 'Connected';
+    document.getElementById('status-text').textContent = t('connected');
 }
 
 async function loadData() {
@@ -228,13 +228,13 @@ async function loadData() {
         } else {
             console.error('Zoho API error:', itemsData.message);
             hideLoadingState();
-            alert('Failed to load items: ' + itemsData.message);
+            alert(t('failedToLoadItems') + ': ' + itemsData.message);
             return;
         }
     } catch (error) {
         console.error('Failed to load items:', error);
         hideLoadingState();
-        alert('Failed to load items. Please check your authentication.');
+        alert(t('failedToLoadItems') + '. ' + t('checkAuthentication'));
         return;
     }
     
@@ -261,8 +261,8 @@ async function loadData() {
             const toSelect = document.getElementById('to-warehouse');
             
             // Keep the first empty option
-            fromSelect.innerHTML = '<option value="">Select warehouse...</option>';
-            toSelect.innerHTML = '<option value="">Select warehouse...</option>';
+            fromSelect.innerHTML = `<option value="">${t('selectWarehouse')}</option>`;
+            toSelect.innerHTML = `<option value="">${t('selectWarehouse')}</option>`;
             
             // Populate warehouse dropdowns
             locations.forEach((location, index) => {
@@ -279,20 +279,22 @@ async function loadData() {
         } else {
             console.error('Zoho API error:', locationsData.message);
             hideLoadingState();
-            alert('Failed to load warehouses: ' + locationsData.message);
+            alert(t('failedToLoadWarehouses') + ': ' + locationsData.message);
             return;
         }
     } catch (error) {
         console.error('Failed to load locations:', error);
         hideLoadingState();
-        alert('Failed to load warehouses. Please check your authentication.');
+        alert(t('failedToLoadWarehouses') + '. ' + t('checkAuthentication'));
         return;
     }
     
     // All data loaded successfully - hide loading overlay
     setTimeout(() => {
         hideLoadingState();
-        document.getElementById('status-text').textContent = 'Connected';
+        document.getElementById('status-text').textContent = t('connected');
+        // Show initial products automatically after loading
+        showInitialProducts();
     }, 500); // Small delay to show completion
 }
 
@@ -305,42 +307,75 @@ let searchTimeout;
 function searchProducts() {
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
     const resultsDiv = document.getElementById('search-results');
-    
+
+    // Show initial items if search is empty
     if (!searchTerm) {
-        resultsDiv.innerHTML = '';
+        showInitialProducts();
         return;
     }
-    
-    const filteredItems = items.filter(item => 
+
+    const filteredItems = items.filter(item =>
         item.name.toLowerCase().includes(searchTerm) ||
         (item.sku && item.sku.toLowerCase().includes(searchTerm))
     );
-    
+
     if (filteredItems.length === 0) {
-        resultsDiv.innerHTML = '<div class="empty-state">No products found</div>';
+        resultsDiv.innerHTML = `<div class="empty-state">${t('noProductsFound')}</div>`;
         return;
     }
-    
+
     resultsDiv.innerHTML = filteredItems.map(item => `
         <div class="product-item" onclick="selectProduct('${item.item_id}')">
             <div class="product-info">
                 <div class="product-name">${item.name}</div>
                 <div class="product-details">
-                    SKU: ${item.sku || 'N/A'} | 
+                    SKU: ${item.sku || 'N/A'} |
                     Unit: ${item.unit || 'qty'}
                     ${item.unit ? ` | ${parseUnitInfo(item.unit)}` : ''}
                 </div>
             </div>
-            ${item.unit && hasUnitConversion(item.unit) ? 
+            ${item.unit && hasUnitConversion(item.unit) ?
                 `<div class="product-unit">${parseUnitInfo(item.unit)}</div>` : ''}
         </div>
     `).join('');
 }
 
+function showInitialProducts() {
+    const resultsDiv = document.getElementById('search-results');
+
+    if (!items || items.length === 0) {
+        resultsDiv.innerHTML = `<div class="empty-state">${t('noProductsAvailable')}</div>`;
+        return;
+    }
+
+    // Limit initial display to 100 items for performance
+    const itemsToShow = items.slice(0, 100);
+
+    resultsDiv.innerHTML = `
+        <div style="padding: 10px; background: #f0f0f0; margin-bottom: 10px; border-radius: 4px;">
+            Showing ${itemsToShow.length} of ${items.length} items. Start typing to search all items.
+        </div>
+        ${itemsToShow.map(item => `
+            <div class="product-item" onclick="selectProduct('${item.item_id}')">
+                <div class="product-info">
+                    <div class="product-name">${item.name}</div>
+                    <div class="product-details">
+                        SKU: ${item.sku || 'N/A'} |
+                        Unit: ${item.unit || 'qty'}
+                        ${item.unit ? ` | ${parseUnitInfo(item.unit)}` : ''}
+                    </div>
+                </div>
+                ${item.unit && hasUnitConversion(item.unit) ?
+                    `<div class="product-unit">${parseUnitInfo(item.unit)}</div>` : ''}
+            </div>
+        `).join('')}
+    `;
+}
+
 function searchProductsWithDelay() {
     // Clear existing timeout
     clearTimeout(searchTimeout);
-    
+
     // Set new timeout for delayed search
     searchTimeout = setTimeout(() => {
         searchProducts();
@@ -459,7 +494,7 @@ function selectProduct(itemId) {
     if (hasCartonInfo) {
         const piecesPerCarton = getPiecesPerCarton(currentProduct.unit);
         const containerName = getContainerName(currentProduct.unit);
-        cartonInfo.textContent = `${piecesPerCarton} pcs per ${containerName.slice(0, -1)}`;
+        cartonInfo.textContent = t('pcsPerUnit', { unit: containerName.slice(0, -1) }).replace('pcs', piecesPerCarton);
         cartonsInput.disabled = false;
         cartonsInput.style.opacity = '1';
         cartonInfo.style.opacity = '1';
@@ -467,7 +502,7 @@ function selectProduct(itemId) {
         cartonsInput.disabled = true;
         cartonsInput.style.opacity = '0.5';
         cartonInfo.style.opacity = '0.5';
-        cartonInfo.textContent = 'no conversion available';
+        cartonInfo.textContent = t('noConversionAvailable');
     }
     
     // Reset input values
@@ -513,9 +548,9 @@ function updateCalculatedQuantity() {
         const totalPieces = (cartonsValue * piecesPerCarton) + piecesValue;
         
         if (totalCartons > 0) {
-            displayText = `${totalCartons.toFixed(4)} ${containerName} (${totalPieces} pieces total)`;
+            displayText = `${totalCartons.toFixed(4)} ${containerName} (${totalPieces} ${t('piecesTotal')})`;
         } else {
-            displayText = '0 cartons';
+            displayText = `0 ${t('cartons').toLowerCase()}`;
         }
         
         console.log('DEBUG: Conversion calculation', { 
@@ -531,7 +566,7 @@ function updateCalculatedQuantity() {
         // No conversion available - treat everything as units
         totalCartons = piecesValue + cartonsValue;
         if (totalCartons > 0) {
-            displayText = `${totalCartons} units`;
+            displayText = `${totalCartons} ${t('units')}`;
         }
     }
     
@@ -816,7 +851,7 @@ function addToCart() {
     const cartonsValue = parseFloat(document.getElementById('cartons-input').value) || 0;
     
     if (piecesValue <= 0 && cartonsValue <= 0) {
-        alert('Please enter a valid quantity in at least one field');
+        alert(t('pleaseEnterValidQuantity'));
         return;
     }
     
@@ -834,16 +869,16 @@ function addToCart() {
         // Create display text based on what was entered
         if (piecesValue > 0 && cartonsValue > 0) {
             // Both fields have values
-            displayText = `${cartonsValue} ${containerName} + ${piecesValue} pieces (${transferQuantity.toFixed(4)} ${containerName} total)`;
-            itemDescription = `Mixed quantity: ${cartonsValue} ${containerName} + ${piecesValue} pieces = ${transferQuantity.toFixed(4)} ${containerName} (${totalPieces} pieces total)`;
+            displayText = `${cartonsValue} ${containerName} + ${piecesValue} ${t('pieces').toLowerCase()} (${transferQuantity.toFixed(4)} ${containerName} ${t('total').toLowerCase()})`;
+            itemDescription = `Mixed quantity: ${cartonsValue} ${containerName} + ${piecesValue} ${t('pieces').toLowerCase()} = ${transferQuantity.toFixed(4)} ${containerName} (${totalPieces} ${t('piecesTotal')})`;
         } else if (piecesValue > 0) {
             // Only pieces entered
-            displayText = `${piecesValue} pieces (${transferQuantity.toFixed(4)} ${containerName})`;
-            itemDescription = `Original: ${piecesValue} pieces (converted to ${transferQuantity.toFixed(4)} ${containerName})`;
+            displayText = `${piecesValue} ${t('pieces').toLowerCase()} (${transferQuantity.toFixed(4)} ${containerName})`;
+            itemDescription = `Original: ${piecesValue} ${t('pieces').toLowerCase()} (converted to ${transferQuantity.toFixed(4)} ${containerName})`;
         } else {
             // Only cartons entered
-            displayText = `${cartonsValue} ${containerName} (${totalPieces} pieces)`;
-            itemDescription = `Original: ${cartonsValue} ${containerName} (${totalPieces} pieces equivalent)`;
+            displayText = `${cartonsValue} ${containerName} (${totalPieces} ${t('pieces').toLowerCase()})`;
+            itemDescription = `Original: ${cartonsValue} ${containerName} (${totalPieces} ${t('pieces').toLowerCase()} equivalent)`;
         }
         
         console.log('DEBUG: addToCart dual inputs', { 
@@ -857,7 +892,7 @@ function addToCart() {
     } else {
         // No conversion available
         const totalQuantity = piecesValue + cartonsValue;
-        displayText = `${totalQuantity} units`;
+        displayText = `${totalQuantity} ${t('units')}`;
         transferQuantity = totalQuantity;
         console.log('DEBUG: addToCart no conversion', { piecesValue, cartonsValue, totalQuantity });
     }
@@ -902,7 +937,7 @@ function updateCartDisplay() {
     const cartDiv = document.getElementById('cart-items');
     
     if (cart.length === 0) {
-        cartDiv.innerHTML = '<div class="empty-state">No items in transfer order</div>';
+        cartDiv.innerHTML = `<div class="empty-state">${t('noItemsInTransferOrder')}</div>`;
         return;
     }
     
@@ -912,7 +947,7 @@ function updateCartDisplay() {
                 <div class="cart-item-name">${item.name}</div>
                 <div class="cart-item-quantity">${item.displayText}</div>
             </div>
-            <button class="remove-btn" onclick="removeFromCart(${index})">Remove</button>
+            <button class="remove-btn" onclick="removeFromCart(${index})">${t('remove')}</button>
         </div>
     `).join('');
 }
@@ -941,17 +976,17 @@ async function createTransferOrder() {
     console.log('Cart items:', cart);
     
     if (!fromWarehouse || !toWarehouse) {
-        alert('Please select both from and to warehouses');
+        alert(t('pleaseSelectBothWarehouses'));
         return;
     }
     
     if (fromWarehouse === toWarehouse) {
-        alert('From and To warehouses must be different');
+        alert(t('warehousesMustBeDifferent'));
         return;
     }
     
     if (cart.length === 0) {
-        alert('Please add items to the transfer order');
+        alert(t('pleaseAddItemsToTransferOrder'));
         return;
     }
     
@@ -998,7 +1033,7 @@ async function createTransferOrder() {
         } catch (parseError) {
             console.error('Failed to parse response:', parseError);
             hideLoadingState();
-            alert('Error: Invalid response from server');
+            alert(t('invalidResponseFromServer'));
             return;
         }
         
@@ -1048,7 +1083,7 @@ async function createTransferOrder() {
             } catch (downloadError) {
                 console.error('PDF download error:', downloadError);
                 hideLoadingState();
-                alert('Transfer order created but PDF download failed');
+                alert(t('transferOrderCreatedButPDFFailed'));
             }
         } else {
             console.error('Transfer order failed:', result);
@@ -1064,6 +1099,6 @@ async function createTransferOrder() {
     } catch (error) {
         console.error('Network error:', error);
         hideLoadingState();
-        alert('Error creating transfer order: ' + error.message);
+        alert(t('errorCreatingTransferOrder') + ': ' + error.message);
     }
 }

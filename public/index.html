@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta name="cache-buster" content="175000">
-    
+
     <!-- PWA Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,34 +15,44 @@
     <meta name="apple-mobile-web-app-title" content="TO Sweets">
     <meta name="msapplication-TileColor" content="#2c3e50">
     <meta name="theme-color" content="#2c3e50">
-    
+
     <!-- App Icons -->
     <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.svg">
     <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.svg">
     <link rel="icon" type="image/svg+xml" sizes="192x192" href="icons/icon-192x192.svg">
     <link rel="icon" type="image/svg+xml" sizes="512x512" href="icons/icon-512x512.svg">
-    
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    
-    <title>Transfer Order Sweets</title>
+
+    <title>حلويات أوامر النقل</title>
     <link rel="stylesheet" href="styles.css?v=174000">
+    <link rel="stylesheet" href="rtl-support.css?v=175000">
 </head>
 <body>
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <label data-i18n="language">اللغة</label>
+        <select id="language-selector" onchange="setLanguage(this.value)">
+            <option value="ar" selected>العربية</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+
     <div id="app">
         <!-- Loading Overlay -->
         <div id="loading-overlay" class="loading-overlay">
             <div class="loading-content">
                 <div class="loading-spinner"></div>
-                <h2 id="loading-title">Connecting to Zoho...</h2>
-                <p id="loading-message">Please wait while we establish connection</p>
+                <h2 id="loading-title" data-i18n="connectingToZoho">جاري الاتصال بـ Zoho...</h2>
+                <p id="loading-message" data-i18n="pleaseWaitConnection">يرجى الانتظار بينما نقوم بإنشاء الاتصال</p>
                 <div id="loading-progress" class="progress-container" style="display: none;">
                     <div class="progress-item">
-                        <span>Items:</span>
+                        <span data-i18n="items">العناصر:</span>
                         <span id="items-progress">0/0</span>
                     </div>
                     <div class="progress-item">
-                        <span>Warehouses:</span>
+                        <span data-i18n="warehouses">المخازن:</span>
                         <span id="warehouses-progress">0/0</span>
                     </div>
                     <div class="progress-bar">
@@ -53,10 +63,10 @@
         </div>
 
         <header>
-            <h1>Transfer Order Sweets</h1>
+            <h1 data-i18n="appTitle">حلويات أوامر النقل</h1>
             <div id="auth-status">
-                <button id="login-btn" onclick="login()">Connect to Zoho</button>
-                <button id="sync-btn" onclick="syncData()" style="display: none;">Sync Data</button>
+                <button id="login-btn" onclick="login()" data-i18n="connectToZoho">الاتصال بـ Zoho</button>
+                <button id="sync-btn" onclick="syncData()" style="display: none;" data-i18n="syncData">مزامنة البيانات</button>
                 <span id="status-text"></span>
             </div>
         </header>
@@ -64,22 +74,22 @@
         <div id="main-content" style="display: none;">
             <!-- Sync Status -->
             <div id="sync-status" class="sync-status">
-                <p>Items synced: <span id="items-count">0</span></p>
-                <p>Warehouses loaded: <span id="warehouses-count">0</span></p>
+                <p><span data-i18n="itemsSynced">العناصر المُزامنة:</span> <span id="items-count">0</span></p>
+                <p><span data-i18n="warehousesLoaded">المخازن المُحمّلة:</span> <span id="warehouses-count">0</span></p>
             </div>
 
             <!-- Warehouse Selection -->
             <div class="warehouse-selection">
                 <div class="warehouse-group">
-                    <label>From Warehouse:</label>
+                    <label data-i18n="fromWarehouse">من المخزن:</label>
                     <select id="from-warehouse">
-                        <option value="">Select warehouse...</option>
+                        <option value="" data-i18n="selectWarehouse">اختر المخزن...</option>
                     </select>
                 </div>
                 <div class="warehouse-group">
-                    <label>To Warehouse:</label>
+                    <label data-i18n="toWarehouse">إلى المخزن:</label>
                     <select id="to-warehouse">
-                        <option value="">Select warehouse...</option>
+                        <option value="" data-i18n="selectWarehouse">اختر المخزن...</option>
                     </select>
                 </div>
             </div>
@@ -89,8 +99,8 @@
                 <!-- Left Side: Search -->
                 <div class="search-section">
                     <div class="search-container">
-                        <input type="text" id="search-input" placeholder="Start typing to search products by name or SKU..." />
-                        <button onclick="searchProducts()">Search</button>
+                        <input type="text" id="search-input" placeholder="ابحث عن المنتجات بالاسم أو رمز SKU..." data-i18n="searchPlaceholder" />
+                        <button onclick="searchProducts()" data-i18n="search">بحث</button>
                     </div>
                     <div id="search-results"></div>
                 </div>
@@ -98,9 +108,9 @@
                 <!-- Right Side: Cart -->
                 <div class="cart-section">
                     <div id="cart-section">
-                        <h2>Transfer Order Items</h2>
+                        <h2 data-i18n="transferOrderItems">عناصر أمر النقل</h2>
                         <div id="cart-items"></div>
-                        <button id="create-transfer-btn" onclick="createTransferOrder()">Create Transfer Order</button>
+                        <button id="create-transfer-btn" onclick="createTransferOrder()" data-i18n="createTransferOrder">إنشاء أمر النقل</button>
                     </div>
                 </div>
             </div>
@@ -112,7 +122,7 @@
             <div class="popup-container">
                 <div class="popup-header">
                     <h3 id="popup-product-name" class="popup-title"></h3>
-                    <button class="popup-close" onclick="closePopup()" aria-label="Close">
+                    <button class="popup-close" onclick="closePopup()" aria-label="Close" data-i18n-aria="close">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -124,7 +134,7 @@
                     <div class="input-grid">
                         <div class="input-group">
                             <label class="input-label">
-                                <span class="label-text">Pieces</span>
+                                <span class="label-text" data-i18n="pieces">القطع</span>
                                 <span class="label-icon">📦</span>
                             </label>
                             <div class="input-wrapper">
@@ -135,7 +145,7 @@
                         
                         <div class="input-group">
                             <label class="input-label">
-                                <span class="label-text">Cartons</span>
+                                <span class="label-text" data-i18n="cartons">الكراتين</span>
                                 <span class="label-icon">📋</span>
                             </label>
                             <div class="input-wrapper">
@@ -149,25 +159,26 @@
                     <div class="total-card">
                         <div class="total-header">
                             <span class="total-icon">🎯</span>
-                            <span class="total-label">Total Transfer</span>
+                            <span class="total-label" data-i18n="totalTransfer">إجمالي النقل</span>
                         </div>
-                        <div class="total-value" id="total-quantity">0 cartons</div>
+                        <div class="total-value" id="total-quantity">0 كراتين</div>
                     </div>
                 </div>
                 
                 <div class="popup-footer">
                     <button class="btn btn-secondary" onclick="closePopup()">
-                        <span>Cancel</span>
+                        <span data-i18n="cancel">إلغاء</span>
                     </button>
                     <button class="btn btn-primary" onclick="addToCart()">
                         <span class="btn-icon">➕</span>
-                        <span>Add to Cart</span>
+                        <span data-i18n="addToCart">إضافة للسلة</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="translations.js?v=175000"></script>
     <script src="app-new.js?v=175200"></script>
 </body>
 </html>
