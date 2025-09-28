@@ -876,20 +876,30 @@ h1 {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    /* Hide header (app title and connect button) on mobile */
+    header {
+        display: none;
+    }
+
+    /* Hide sync status (items synced and warehouses loaded) on mobile */
+    .sync-status {
+        display: none;
+    }
+
     .main-layout {
         flex-direction: column;
         height: auto;
     }
-    
+
     .search-section,
     .cart-section {
         flex: none;
     }
-    
+
     #search-results {
         max-height: 400px;
     }
-    
+
     #cart-items {
         max-height: 300px;
     }

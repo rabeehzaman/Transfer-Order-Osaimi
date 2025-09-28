@@ -206,10 +206,13 @@
 
 /* Mobile Responsive RTL */
 @media (max-width: 768px) {
+    /* Hide language switcher on mobile devices */
+    .language-switcher {
+        display: none;
+    }
+
     [dir="rtl"] .language-switcher {
-        top: 10px;
-        left: 10px;
-        right: auto;
+        display: none;
     }
 
     [dir="rtl"] .main-layout {
