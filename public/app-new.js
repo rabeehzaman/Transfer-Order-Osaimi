@@ -329,8 +329,8 @@ function searchProducts() {
             <div class="product-info">
                 <div class="product-name">${item.name}</div>
                 <div class="product-details">
-                    SKU: ${item.sku || 'N/A'} |
-                    Unit: ${item.unit || 'qty'}
+                    ${t('sku')}: ${item.sku || 'N/A'} |
+                    ${t('unit')}: ${item.unit || t('qty')}
                     ${item.unit ? ` | ${parseUnitInfo(item.unit)}` : ''}
                 </div>
             </div>
@@ -353,15 +353,17 @@ function showInitialProducts() {
 
     resultsDiv.innerHTML = `
         <div style="padding: 10px; background: #f0f0f0; margin-bottom: 10px; border-radius: 4px;">
-            Showing ${itemsToShow.length} of ${items.length} items. Start typing to search all items.
+            ${currentLanguage === 'ar'
+                ? `عرض ${itemsToShow.length} من ${items.length} عنصر. ابدأ الكتابة للبحث في جميع العناصر.`
+                : `Showing ${itemsToShow.length} of ${items.length} items. Start typing to search all items.`}
         </div>
         ${itemsToShow.map(item => `
             <div class="product-item" onclick="selectProduct('${item.item_id}')">
                 <div class="product-info">
                     <div class="product-name">${item.name}</div>
                     <div class="product-details">
-                        SKU: ${item.sku || 'N/A'} |
-                        Unit: ${item.unit || 'qty'}
+                        ${t('sku')}: ${item.sku || 'N/A'} |
+                        ${t('unit')}: ${item.unit || t('qty')}
                         ${item.unit ? ` | ${parseUnitInfo(item.unit)}` : ''}
                     </div>
                 </div>
@@ -384,14 +386,19 @@ function searchProductsWithDelay() {
 
 function parseUnitInfo(unit) {
     if (!hasUnitConversion(unit)) return '';
-    
+
     const unitsPerContainer = getUnitsPerContainer(unit);
     const containerName = getContainerName(unit);
-    
+
     // Capitalize first letter of container name
     const capitalizedContainer = containerName.charAt(0).toUpperCase() + containerName.slice(1, -1);
-    
-    return `1 ${capitalizedContainer} = ${unitsPerContainer} Pieces`;
+
+    // Return localized unit info based on current language
+    if (currentLanguage === 'ar') {
+        return `1 ${capitalizedContainer} = ${unitsPerContainer} قطعة`;
+    } else {
+        return `1 ${capitalizedContainer} = ${unitsPerContainer} Pieces`;
+    }
 }
 
 function hasUnitConversion(unit) {
@@ -494,7 +501,11 @@ function selectProduct(itemId) {
     if (hasCartonInfo) {
         const piecesPerCarton = getPiecesPerCarton(currentProduct.unit);
         const containerName = getContainerName(currentProduct.unit);
-        cartonInfo.textContent = t('pcsPerUnit', { unit: containerName.slice(0, -1) }).replace('pcs', piecesPerCarton);
+        if (currentLanguage === 'ar') {
+            cartonInfo.textContent = `${piecesPerCarton} قطعة لكل ${containerName.slice(0, -1)}`;
+        } else {
+            cartonInfo.textContent = `${piecesPerCarton} pcs per ${containerName.slice(0, -1)}`;
+        }
         cartonsInput.disabled = false;
         cartonsInput.style.opacity = '1';
         cartonInfo.style.opacity = '1';
@@ -870,15 +881,15 @@ function addToCart() {
         if (piecesValue > 0 && cartonsValue > 0) {
             // Both fields have values
             displayText = `${cartonsValue} ${containerName} + ${piecesValue} ${t('pieces').toLowerCase()} (${transferQuantity.toFixed(4)} ${containerName} ${t('total').toLowerCase()})`;
-            itemDescription = `Mixed quantity: ${cartonsValue} ${containerName} + ${piecesValue} ${t('pieces').toLowerCase()} = ${transferQuantity.toFixed(4)} ${containerName} (${totalPieces} ${t('piecesTotal')})`;
+            itemDescription = `${t('mixedQuantity')}: ${cartonsValue} ${containerName} + ${piecesValue} ${t('pieces').toLowerCase()} = ${transferQuantity.toFixed(4)} ${containerName} (${totalPieces} ${t('piecesTotal')})`;
         } else if (piecesValue > 0) {
             // Only pieces entered
             displayText = `${piecesValue} ${t('pieces').toLowerCase()} (${transferQuantity.toFixed(4)} ${containerName})`;
-            itemDescription = `Original: ${piecesValue} ${t('pieces').toLowerCase()} (converted to ${transferQuantity.toFixed(4)} ${containerName})`;
+            itemDescription = `${t('original')}: ${piecesValue} ${t('pieces').toLowerCase()} (${t('convertedTo')} ${transferQuantity.toFixed(4)} ${containerName})`;
         } else {
             // Only cartons entered
             displayText = `${cartonsValue} ${containerName} (${totalPieces} ${t('pieces').toLowerCase()})`;
-            itemDescription = `Original: ${cartonsValue} ${containerName} (${totalPieces} ${t('pieces').toLowerCase()} equivalent)`;
+            itemDescription = `${t('original')}: ${cartonsValue} ${containerName} (${totalPieces} ${t('pieces').toLowerCase()} ${t('equivalent')})`;
         }
         
         console.log('DEBUG: addToCart dual inputs', { 

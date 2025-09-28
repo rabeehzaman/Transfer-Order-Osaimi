@@ -75,7 +75,18 @@ const translations = {
         // Language Switcher
         language: 'اللغة',
         arabic: 'العربية',
-        english: 'English'
+        english: 'English',
+
+        // PDF Descriptions
+        mixedQuantity: 'كمية مختلطة',
+        original: 'الأصل',
+        convertedTo: 'محول إلى',
+        equivalent: 'مكافئ',
+
+        // Product Details
+        sku: 'رمز SKU',
+        unit: 'الوحدة',
+        qty: 'الكمية'
     },
 
     en: {
@@ -154,7 +165,18 @@ const translations = {
         // Language Switcher
         language: 'Language',
         arabic: 'العربية',
-        english: 'English'
+        english: 'English',
+
+        // PDF Descriptions
+        mixedQuantity: 'Mixed quantity',
+        original: 'Original',
+        convertedTo: 'converted to',
+        equivalent: 'equivalent',
+
+        // Product Details
+        sku: 'SKU',
+        unit: 'Unit',
+        qty: 'qty'
     }
 };
 
@@ -202,6 +224,16 @@ function updateTranslations() {
 
     // Update dynamic elements that might exist
     updateDynamicTranslations();
+
+    // Refresh search results to update unit badges
+    if (typeof searchProducts === 'function') {
+        const searchInput = document.getElementById('search-input');
+        if (searchInput && searchInput.value.trim()) {
+            searchProducts();
+        } else if (typeof showInitialProducts === 'function') {
+            showInitialProducts();
+        }
+    }
 }
 
 function updateDynamicTranslations() {
