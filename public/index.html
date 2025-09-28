@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="cache-buster" content="175000">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TO Sweets">
+    <meta name="msapplication-TileColor" content="#2c3e50">
+    <meta name="theme-color" content="#2c3e50">
+    
+    <!-- App Icons -->
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.svg">
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.svg">
+    <link rel="icon" type="image/svg+xml" sizes="192x192" href="icons/icon-192x192.svg">
+    <link rel="icon" type="image/svg+xml" sizes="512x512" href="icons/icon-512x512.svg">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <title>Transfer Order Sweets</title>
+    <link rel="stylesheet" href="styles.css?v=174000">
+</head>
+<body>
+    <div id="app">
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <h2 id="loading-title">Connecting to Zoho...</h2>
+                <p id="loading-message">Please wait while we establish connection</p>
+                <div id="loading-progress" class="progress-container" style="display: none;">
+                    <div class="progress-item">
+                        <span>Items:</span>
+                        <span id="items-progress">0/0</span>
+                    </div>
+                    <div class="progress-item">
+                        <span>Warehouses:</span>
+                        <span id="warehouses-progress">0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <header>
+            <h1>Transfer Order Sweets</h1>
+            <div id="auth-status">
+                <button id="login-btn" onclick="login()">Connect to Zoho</button>
+                <button id="sync-btn" onclick="syncData()" style="display: none;">Sync Data</button>
+                <span id="status-text"></span>
+            </div>
+        </header>
+
+        <div id="main-content" style="display: none;">
+            <!-- Sync Status -->
+            <div id="sync-status" class="sync-status">
+                <p>Items synced: <span id="items-count">0</span></p>
+                <p>Warehouses loaded: <span id="warehouses-count">0</span></p>
+            </div>
+
+            <!-- Warehouse Selection -->
+            <div class="warehouse-selection">
+                <div class="warehouse-group">
+                    <label>From Warehouse:</label>
+                    <select id="from-warehouse">
+                        <option value="">Select warehouse...</option>
+                    </select>
+                </div>
+                <div class="warehouse-group">
+                    <label>To Warehouse:</label>
+                    <select id="to-warehouse">
+                        <option value="">Select warehouse...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Main Content Layout -->
+            <div class="main-layout">
+                <!-- Left Side: Search -->
+                <div class="search-section">
+                    <div class="search-container">
+                        <input type="text" id="search-input" placeholder="Start typing to search products by name or SKU..." />
+                        <button onclick="searchProducts()">Search</button>
+                    </div>
+                    <div id="search-results"></div>
+                </div>
+
+                <!-- Right Side: Cart -->
+                <div class="cart-section">
+                    <div id="cart-section">
+                        <h2>Transfer Order Items</h2>
+                        <div id="cart-items"></div>
+                        <button id="create-transfer-btn" onclick="createTransferOrder()">Create Transfer Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modern Quantity Popup -->
+        <div id="quantity-popup" class="popup-overlay" style="display: none;">
+            <div class="popup-backdrop" onclick="closePopup()"></div>
+            <div class="popup-container">
+                <div class="popup-header">
+                    <h3 id="popup-product-name" class="popup-title"></h3>
+                    <button class="popup-close" onclick="closePopup()" aria-label="Close">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="popup-body">
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <span class="label-text">Pieces</span>
+                                <span class="label-icon">📦</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="number" id="pieces-input" class="modern-input" min="0" value="0" placeholder="0">
+                                <div class="input-focus-ring"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">
+                                <span class="label-text">Cartons</span>
+                                <span class="label-icon">📋</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="number" id="cartons-input" class="modern-input" min="0" step="0.01" value="0" placeholder="0">
+                                <div class="input-focus-ring"></div>
+                            </div>
+                            <span id="carton-info" class="unit-hint"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="total-card">
+                        <div class="total-header">
+                            <span class="total-icon">🎯</span>
+                            <span class="total-label">Total Transfer</span>
+                        </div>
+                        <div class="total-value" id="total-quantity">0 cartons</div>
+                    </div>
+                </div>
+                
+                <div class="popup-footer">
+                    <button class="btn btn-secondary" onclick="closePopup()">
+                        <span>Cancel</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="addToCart()">
+                        <span class="btn-icon">➕</span>
+                        <span>Add to Cart</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app-new.js?v=175200"></script>
+</body>
+</html>
