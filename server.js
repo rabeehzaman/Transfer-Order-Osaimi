@@ -584,8 +584,8 @@ app.post('/api/transfer-orders', async (req, res) => {
         
         // Use correct field names as per Zoho API documentation
         const transferOrderData = {
-            from_warehouse_id: String(req.body.from_location_id),
-            to_warehouse_id: String(req.body.to_location_id),
+            from_location_id: String(req.body.from_location_id),
+            to_location_id: String(req.body.to_location_id),
             date: req.body.date || new Date().toISOString().split('T')[0],
             line_items: req.body.line_items.map(item => {
                 const lineItem = {
