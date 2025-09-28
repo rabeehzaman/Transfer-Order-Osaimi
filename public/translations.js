@@ -86,7 +86,27 @@ const translations = {
         // Product Details
         sku: 'رمز SKU',
         unit: 'الوحدة',
-        qty: 'الكمية'
+        qty: 'الكمية',
+
+        // Container Names
+        carton: 'كرتونة',
+        cartons: 'كرتونة',
+        bag: 'كيس',
+        bags: 'كيس',
+        tin: 'علبة',
+        tins: 'علبة',
+        dozen: 'دستة',
+        dozens: 'دستة',
+        outer: 'صندوق خارجي',
+        outers: 'صندوق خارجي',
+        unit: 'وحدة',
+        units: 'وحدة',
+        oneCarton: 'كرتونة واحدة',
+        oneBag: 'كيس واحد',
+        oneTin: 'علبة واحدة',
+        oneDozen: 'دستة واحدة',
+        oneOuter: 'صندوق خارجي واحد',
+        oneUnit: 'وحدة واحدة'
     },
 
     en: {
@@ -176,7 +196,27 @@ const translations = {
         // Product Details
         sku: 'SKU',
         unit: 'Unit',
-        qty: 'qty'
+        qty: 'qty',
+
+        // Container Names
+        carton: 'carton',
+        cartons: 'cartons',
+        bag: 'bag',
+        bags: 'bags',
+        tin: 'tin',
+        tins: 'tins',
+        dozen: 'dozen',
+        dozens: 'dozens',
+        outer: 'outer',
+        outers: 'outers',
+        unit: 'unit',
+        units: 'units',
+        oneCarton: '1 Carton',
+        oneBag: '1 Bag',
+        oneTin: '1 Tin',
+        oneDozen: '1 Dozen',
+        oneOuter: '1 Outer',
+        oneUnit: '1 Unit'
     }
 };
 

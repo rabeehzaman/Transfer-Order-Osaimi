@@ -388,16 +388,13 @@ function parseUnitInfo(unit) {
     if (!hasUnitConversion(unit)) return '';
 
     const unitsPerContainer = getUnitsPerContainer(unit);
-    const containerName = getContainerName(unit);
-
-    // Capitalize first letter of container name
-    const capitalizedContainer = containerName.charAt(0).toUpperCase() + containerName.slice(1, -1);
+    const oneContainer = getOneContainerName(unit);
 
     // Return localized unit info based on current language
     if (currentLanguage === 'ar') {
-        return `1 ${capitalizedContainer} = ${unitsPerContainer} قطعة`;
+        return `${oneContainer} = ${unitsPerContainer} قطعة`;
     } else {
-        return `1 ${capitalizedContainer} = ${unitsPerContainer} Pieces`;
+        return `${oneContainer} = ${unitsPerContainer} Pieces`;
     }
 }
 
@@ -462,18 +459,32 @@ function getUnitsPerContainer(unit) {
     return 1;
 }
 
-function getContainerName(unit) {
-    if (!unit) return 'units';
-    
-    // Detect container type from unit name
-    if (/BAG|B\(/i.test(unit)) return 'bags';
-    if (/CTN|CARTON/i.test(unit)) return 'cartons';
-    if (/C\d+/i.test(unit)) return 'cartons';
-    if (/OUTER/i.test(unit)) return 'outers';
-    if (/TIN/i.test(unit)) return 'tins';
-    if (/DZN|DOZEN/i.test(unit)) return 'dozens';
-    
-    return 'units'; // fallback
+function getContainerName(unit, singular = false) {
+    if (!unit) return t(singular ? 'unit' : 'units');
+
+    // Detect container type from unit name and return translated name
+    if (/BAG|B\(/i.test(unit)) return t(singular ? 'bag' : 'bags');
+    if (/CTN|CARTON/i.test(unit)) return t(singular ? 'carton' : 'cartons');
+    if (/C\d+/i.test(unit)) return t(singular ? 'carton' : 'cartons');
+    if (/OUTER/i.test(unit)) return t(singular ? 'outer' : 'outers');
+    if (/TIN/i.test(unit)) return t(singular ? 'tin' : 'tins');
+    if (/DZN|DOZEN/i.test(unit)) return t(singular ? 'dozen' : 'dozens');
+
+    return t(singular ? 'unit' : 'units'); // fallback
+}
+
+function getOneContainerName(unit) {
+    if (!unit) return t('oneUnit');
+
+    // Detect container type and return proper "one X" translation
+    if (/BAG|B\(/i.test(unit)) return t('oneBag');
+    if (/CTN|CARTON/i.test(unit)) return t('oneCarton');
+    if (/C\d+/i.test(unit)) return t('oneCarton');
+    if (/OUTER/i.test(unit)) return t('oneOuter');
+    if (/TIN/i.test(unit)) return t('oneTin');
+    if (/DZN|DOZEN/i.test(unit)) return t('oneDozen');
+
+    return t('oneUnit'); // fallback
 }
 
 // Round quantity to 4 decimal places for consistent precision
@@ -500,11 +511,11 @@ function selectProduct(itemId) {
     
     if (hasCartonInfo) {
         const piecesPerCarton = getPiecesPerCarton(currentProduct.unit);
-        const containerName = getContainerName(currentProduct.unit);
+        const containerName = getContainerName(currentProduct.unit, true); // Get singular form
         if (currentLanguage === 'ar') {
-            cartonInfo.textContent = `${piecesPerCarton} قطعة لكل ${containerName.slice(0, -1)}`;
+            cartonInfo.textContent = `${piecesPerCarton} قطعة لكل ${containerName}`;
         } else {
-            cartonInfo.textContent = `${piecesPerCarton} pcs per ${containerName.slice(0, -1)}`;
+            cartonInfo.textContent = `${piecesPerCarton} pcs per ${containerName}`;
         }
         cartonsInput.disabled = false;
         cartonsInput.style.opacity = '1';
@@ -561,7 +572,7 @@ function updateCalculatedQuantity() {
         if (totalCartons > 0) {
             displayText = `${totalCartons.toFixed(4)} ${containerName} (${totalPieces} ${t('piecesTotal')})`;
         } else {
-            displayText = `0 ${t('cartons').toLowerCase()}`;
+            displayText = `0 ${containerName}`;
         }
         
         console.log('DEBUG: Conversion calculation', { 
